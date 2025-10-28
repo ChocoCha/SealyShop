@@ -16,15 +16,15 @@ class Onboarding extends StatefulWidget{
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset("images/headphone.png"),
+              Image.asset("images/pen.jpg"),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Text(
-                  "Welcome to \nour \nplant shop.",//ยินดีต้อนรับสู่ร้านต้นไม้ของเรา
+                  "Explore \nThe Best \nProducts.",//ยินดีต้อนรับสู่ร้านต้นไม้ของเรา
                   style: TextStyle(
                     color: 
                     Colors.black,
-                    fontSize: 30.0,
+                    fontSize: 50.0,
                     fontWeight: FontWeight.bold
                     ),
                 ),
