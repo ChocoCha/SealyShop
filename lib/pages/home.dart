@@ -77,7 +77,7 @@ List categories=[
                   child: Center(child: Text("All",style: TextStyle(color: Colors.white,fontSize: 20.0,fontWeight: FontWeight.bold),))
                 ),
                 Expanded(
-                  child: Container(
+                  child: SizedBox(
                     height: 130 ,
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
@@ -101,7 +101,7 @@ List categories=[
               ],
             ),
             SizedBox(height: 20.0,),
-            Container(
+            SizedBox(
               height: 240,
               child: ListView(
                 shrinkWrap: true,
@@ -185,7 +185,7 @@ List categories=[
 
 class CategoryTile extends StatelessWidget {
   String image;
-  CategoryTile({required this.image});
+  CategoryTile({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {

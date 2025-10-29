@@ -1,8 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:sealyshop/pages/home.dart';
-import 'package:sealyshop/pages/onboarding.dart';
+import 'package:sealyshop/pages/login.dart';
+import 'package:sealyshop/pages/signup.dart';
 
-void main() {
+void main()async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -16,6 +19,8 @@ class MyApp extends StatelessWidget {
       title: 'Sealy Shop',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        fontFamily: 'Nunito',
+        primarySwatch: Colors.purple,
         // This is the theme of your application.
         //
         // TRY THIS: Try running your application with "flutter run". You'll see
@@ -33,7 +38,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Home(),
+      home: SignUp(),
     );
   }
 }

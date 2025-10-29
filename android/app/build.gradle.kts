@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("com.google.gms.google-services")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -41,4 +41,17 @@ android {
 
 flutter {
     source = "../.."
+}
+
+
+dependencies {
+    // Import the Firebase BoM (Bill of Materials) เพื่อคุมเวอร์ชัน Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+
+    // เพิ่ม Firebase products ที่ต้องการใช้ (ตัวอย่าง: Analytics และ Auth)
+    // เมื่อใช้ BoM ไม่ต้องระบุเวอร์ชันใน dependencies ของ Firebase
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth-ktx") // ตัวอย่าง: สำหรับ Authentication
+    
+    // dependencies อื่น ๆ ของโปรเจกต์ของคุณ
 }
