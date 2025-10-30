@@ -1,74 +1,24 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
-import 'package:sealyshop/pages/bottomnav.dart';
-import 'package:sealyshop/pages/login.dart';
-import 'package:sealyshop/services/database.dart';
-import 'package:sealyshop/services/shared_pref.dart';
+import 'package:sealyshop/Admin/home_admin.dart';
 
-class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+class AdminLogin extends StatefulWidget {
+  const AdminLogin({super.key});
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<AdminLogin> createState() => _AdminLoginState();
 }
 
-
-
-class _SignUpState extends State<SignUp> {
-  String? name, email, password;
-  TextEditingController namecontroller = TextEditingController();
-  TextEditingController mailcontroller = TextEditingController();
-  TextEditingController passwordcontroller = TextEditingController();
-
-  final _formkey= GlobalKey<FormState>();
-
-  registration()async{
-    if(password!=null && name!=null && email!=null){
-      try{
-        UserCredential userCredential= await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email!, password: password!);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.redAccent,
-          content: Text("Resgistered Succesfully",style: TextStyle(fontSize: 20.0),)));
-          String Id= randomAlphaNumeric(10);
-          await SharedPreferenceHelper().saveUserEmail(mailcontroller.text);
-          await SharedPreferenceHelper().saveUserId(Id);
-          await SharedPreferenceHelper().saveUserName(namecontroller.text);
-          await SharedPreferenceHelper().saveUserImage("https://cdn-icons-png.freepik.com/512/9368/9368284.png");
-          Map<String, dynamic> userInfoMap={
-            "Name" : namecontroller.text,
-            "Email" : mailcontroller.text,
-            "Id" : Id,
-              "Image":
-                "https://cdn-icons-png.freepik.com/512/9368/9368284.png"
-          };
-          await DatabaseMethod().addUserDetails(userInfoMap, Id);
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomNav()));
-      } on FirebaseException catch(e){
-        if(e.code=='weak'){
-           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.redAccent,
-          content: Text("Password Provided is too Weak",style: TextStyle(fontSize: 20.0),)));
-        }
-        else if(e.code=="email-already-in-use"){
-           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.redAccent,
-          content: Text("Account Already exsists",style: TextStyle(fontSize: 20.0),)));
-        }
-      }
-    }
-  }
-
-
-  
+class _AdminLoginState extends State<AdminLogin> {
+  TextEditingController usernamecontroller= new TextEditingController();
+  TextEditingController userpasswordcontroller= new TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+   return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: Form(
-          key: _formkey,
-          child: Column(
+        child: Column(
             children: [
               // Header Section with Curved Bottom
               ClipPath(
@@ -107,7 +57,7 @@ class _SignUpState extends State<SignUp> {
                     
                     // Sign In Title
                     Text(
-                      "SIGN UP",
+                      "Admin Panel",
                       style: TextStyle(
                         fontSize: 32.0,
                         fontWeight: FontWeight.bold,
@@ -116,20 +66,13 @@ class _SignUpState extends State<SignUp> {
                     ),
                     
   
-                    Text(
-                      "please enter details below to continue.",
-                      style: TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w500,
-                        color: Color.fromARGB(255, 90, 80, 105),
-                      ),
-                    ),
+                    
                     
                     SizedBox(height: 30.0),
           
                     // Name Label
                     Text(
-                      "Name",
+                      "Username",
                       style: TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w600,
@@ -149,18 +92,13 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       child: TextFormField(
-                        validator: (value){
-                          if(value==null|| value.isEmpty){
-                            return'Please enter your Name';
-                          }
-                          return null;
-                        },
-                        controller: namecontroller,
+                        
+                        controller: usernamecontroller,
                         keyboardType: TextInputType.emailAddress,
                         style: TextStyle(fontSize: 16.0),
                         decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "your name",
+                          hintText: "Username",
                           hintStyle: TextStyle(
                             color: Color(0xFFBDBDBD),
                             fontSize: 15.0,
@@ -177,56 +115,6 @@ class _SignUpState extends State<SignUp> {
                     
                     SizedBox(height: 25.0),
                     
-                    
-                    // Email Label
-                    Text(
-                      "Email",
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF6D6D6D),
-                      ),
-                    ),
-                    SizedBox(height: 8.0),
-                    
-                    // Email Field
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Color(0xFFE0E0E0),
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                      child: TextFormField(
-                        validator: (value){
-                          if(value==null|| value.isEmpty){
-                            return'Please enter your Email';
-                          }
-                          return null;
-                        },
-                        controller: mailcontroller,
-                        keyboardType: TextInputType.emailAddress,
-                        style: TextStyle(fontSize: 16.0),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "youremail@email.com",
-                          hintStyle: TextStyle(
-                            color: Color(0xFFBDBDBD),
-                            fontSize: 15.0,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: Color(0xFF9E9E9E),
-                            size: 20,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(vertical: 15.0),
-                        ),
-                      ),
-                    ),
-                    
-                    SizedBox(height: 25.0),
                     
                     // Password Label
                     Text(
@@ -250,13 +138,7 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       child: TextFormField(
-                        validator: (value){
-                          if(value==null|| value.isEmpty){
-                            return'Please enter your Password';
-                          }
-                          return null;
-                        },
-                        controller: passwordcontroller,
+                        controller: userpasswordcontroller,
                         obscureText: true,
                         style: TextStyle(fontSize: 16.0),
                         decoration: InputDecoration(
@@ -282,17 +164,10 @@ class _SignUpState extends State<SignUp> {
                     
                     SizedBox(height: 30.0),
                     
-                    // Signup Button
+                    // loginAdmin Button
                     GestureDetector(
                       onTap: (){
-                        if(_formkey.currentState!.validate()){
-                          setState(() {
-                            name= namecontroller.text;
-                            email= mailcontroller.text;
-                            password= passwordcontroller.text;
-                          });
-                        }
-                        registration();
+                        loginAdmin();
                       },
                       child: Center(
                         child: Container(
@@ -321,7 +196,7 @@ class _SignUpState extends State<SignUp> {
                               
                               child: Center(
                                 child: Text(
-                                  "SIGNUP",
+                                  "LOGIN",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18.0,
@@ -337,35 +212,7 @@ class _SignUpState extends State<SignUp> {
                     
                     SizedBox(height: 25.0),
                     
-                    // Sign Up Link
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Already have an account ? ",
-                            style: TextStyle(
-                              color: Color(0xFF9E9E9E),
-                              fontSize: 14.0,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=> LogIn()));
-                            },
-                            child: Text(
-                                "Sign in",
-                                style: TextStyle(
-                                  color: Color(0xFF9458ED),
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                          ),
-                          
-                        ],
-                      ),
-                    ),
+                    
                     
                     SizedBox(height: 30.0),
                   ],
@@ -374,15 +221,35 @@ class _SignUpState extends State<SignUp> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   @override
   void dispose() {
     super.dispose();
   }
-}
+
+  loginAdmin(){
+  FirebaseFirestore.instance.collection("Admin").get().then((snapshot){
+    snapshot.docs.forEach((result){
+      if(result.data()['username']!=usernamecontroller.text.trim()){
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text("Your id is not correct",style: TextStyle(fontSize: 20.0),)));
+        }
+        else if(result.data()['password']!=userpasswordcontroller.text.trim()){
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text("Your password is not correct",style: TextStyle(fontSize: 20.0),)));
+        }
+        else{
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeAdmin()));
+        }
+    });
+  });
+ }
+ }
+
 
 // Custom Clipper for Curved Bottom
 class CurvedBottomClipper extends CustomClipper<Path> {
@@ -424,3 +291,5 @@ class CurvedBottomClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+
+

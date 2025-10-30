@@ -45,13 +45,15 @@ flutter {
 
 
 dependencies {
-    // Import the Firebase BoM (Bill of Materials) เพื่อคุมเวอร์ชัน Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+  // Import the Firebase BoM
+  implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
 
-    // เพิ่ม Firebase products ที่ต้องการใช้ (ตัวอย่าง: Analytics และ Auth)
-    // เมื่อใช้ BoM ไม่ต้องระบุเวอร์ชันใน dependencies ของ Firebase
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth-ktx") // ตัวอย่าง: สำหรับ Authentication
-    
-    // dependencies อื่น ๆ ของโปรเจกต์ของคุณ
+
+  // TODO: Add the dependencies for Firebase products you want to use
+  // When using the BoM, don't specify versions in Firebase dependencies
+  implementation("com.google.firebase:firebase-analytics")
+
+
+  // Add the dependencies for any other desired Firebase products
+  // https://firebase.google.com/docs/android/setup#available-libraries
 }

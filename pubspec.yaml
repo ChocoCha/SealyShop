@@ -31,11 +31,12 @@ dependencies:
   flutter:
     sdk: flutter
   curved_navigation_bar: ^1.0.6
-  
+  cloud_firestore: 
   firebase_core: 
   firebase_auth: 
+  random_string: ^2.3.1
   cupertino_icons: ^1.0.8
-  cloud_firestore: 
+  shared_preferences: 
 
 dev_dependencies:
   flutter_test:
