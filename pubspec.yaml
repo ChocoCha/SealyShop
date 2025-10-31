@@ -37,6 +37,8 @@ dependencies:
   random_string: ^2.3.1
   cupertino_icons: ^1.0.8
   shared_preferences: 
+  image_picker: 
+  firebase_storage: 
 
 dev_dependencies:
   flutter_test:
