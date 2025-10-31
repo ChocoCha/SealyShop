@@ -56,7 +56,7 @@ class _ProductDetailState extends State<ProductDetail> {
                   Text("Details",style: AppWidget.semiboldTextFeildStyle(),),
                   SizedBox(height: 10,),
                   Text("The product is very good fountain pen with smooth ink and line and have refill ink taht you can refill ink inside it "),
-                  SizedBox(height: 150,),
+                  SizedBox(height: 30,),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 20.0),
                     decoration: BoxDecoration(color: Color(0xFFfd6f36),borderRadius: BorderRadius.circular(10)),

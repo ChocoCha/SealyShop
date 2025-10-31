@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sealyshop/Admin/add_product.dart';
 import 'package:sealyshop/Admin/admin_login.dart';
+import 'package:sealyshop/pages/bottomnav.dart';
+import 'package:sealyshop/pages/product_detail.dart';
 import 'package:sealyshop/pages/signup.dart';
 
 void main()async {
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: AddProduct(),
+      home: BottomNav(),
     );
   }
 }

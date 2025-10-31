@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sealyshop/Admin/add_product.dart';
 
 class DatabaseMethod{
 
@@ -8,4 +9,11 @@ class DatabaseMethod{
       .doc(id)
       .set(userInfoMap);
   }
+  
+  Future AddProduct(Map<String, dynamic> userInfoMap, String categoryname)async{
+    return await FirebaseFirestore.instance
+      .collection(categoryname)
+      .add(userInfoMap);
+  }
+
 }
