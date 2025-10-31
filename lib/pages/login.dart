@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sealyshop/pages/bottomnav.dart';
-import 'package:sealyshop/pages/home.dart';
 import 'package:sealyshop/pages/signup.dart';
 
 class LogIn extends StatefulWidget {

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sealyshop/Admin/add_product.dart';
 
 class DatabaseMethod{
 
@@ -17,7 +16,7 @@ class DatabaseMethod{
   }
 
   Future<Stream<QuerySnapshot>> getProducts(String category)async{
-    return await FirebaseFirestore.instance.collection(category).snapshots();
+    return FirebaseFirestore.instance.collection(category).snapshots();
   }
 
 }

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sealyshop/Admin/home_admin.dart';
 
@@ -11,8 +10,8 @@ class AdminLogin extends StatefulWidget {
 }
 
 class _AdminLoginState extends State<AdminLogin> {
-  TextEditingController usernamecontroller= new TextEditingController();
-  TextEditingController userpasswordcontroller= new TextEditingController();
+  TextEditingController usernamecontroller= TextEditingController();
+  TextEditingController userpasswordcontroller= TextEditingController();
   @override
   Widget build(BuildContext context) {
    return Scaffold(
@@ -231,7 +230,7 @@ class _AdminLoginState extends State<AdminLogin> {
 
   loginAdmin(){
   FirebaseFirestore.instance.collection("Admin").get().then((snapshot){
-    snapshot.docs.forEach((result){
+    for (var result in snapshot.docs) {
       if(result.data()['username']!=usernamecontroller.text.trim()){
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.redAccent,
@@ -245,7 +244,7 @@ class _AdminLoginState extends State<AdminLogin> {
         else{
           Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeAdmin()));
         }
-    });
+    }
   });
  }
  }

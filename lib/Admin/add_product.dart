@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 import 'package:sealyshop/services/database.dart';
-import 'package:sealyshop/widget/support_widget.dart';
 
 class AddProduct extends StatefulWidget {
   const AddProduct({super.key});

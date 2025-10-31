@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:sealyshop/widget/support_widget.dart';
 
 class ProductDetail extends StatefulWidget {
-  const ProductDetail({super.key});
+  String image, name, detail, price;
+  ProductDetail({required this.detail, required this.image,required this.name, required this.price});
 
   @override
   State<ProductDetail> createState() => _ProductDetailState();
 }
 
 class _ProductDetailState extends State<ProductDetail> {
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +32,8 @@ class _ProductDetailState extends State<ProductDetail> {
                 decoration: BoxDecoration(border: Border.all(),borderRadius: BorderRadius.circular(30)),
                 child: Icon(Icons.arrow_back_ios_new_outlined)),
               ),
-              Center(child: Image.asset("images/pen2.png",height: 400,))
+              Center(child: Image.network(
+                widget.image,height: 400,))
 
             ]
           ),
@@ -48,14 +52,14 @@ class _ProductDetailState extends State<ProductDetail> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Fountain Pen", style: AppWidget.boldTextFeildStyle(),),
-                      Text("\$150",style: TextStyle(color: Color(0xFFfd6f36),fontSize: 23.0,fontWeight: FontWeight.bold))
+                      Text(widget.name, style: AppWidget.boldTextFeildStyle(),),
+                      Text("\$"+widget.price,style: TextStyle(color: Color(0xFFfd6f36),fontSize: 23.0,fontWeight: FontWeight.bold))
                     ],
                   ),
                   SizedBox(height: 20.0,),
                   Text("Details",style: AppWidget.semiboldTextFeildStyle(),),
                   SizedBox(height: 10,),
-                  Text("The product is very good fountain pen with smooth ink and line and have refill ink taht you can refill ink inside it "),
+                  Text(widget.detail),
                   SizedBox(height: 30,),
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 20.0),

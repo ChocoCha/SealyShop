@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:sealyshop/pages/category_products.dart';
-import 'package:sealyshop/widget/support_widget.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -39,7 +38,7 @@ class _HomeState extends State<Home> {
 
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFF8F9FE),
+        backgroundColor: Color(0xFFF3E5FF),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
@@ -49,7 +48,7 @@ class _HomeState extends State<Home> {
                 Stack(
                   children: [
                     // GIF Background Container (เต็มจอ ไม่มีขอบ)
-                    Container(
+                    SizedBox(
                       height: 220,
                       width: double.infinity,
                       child: Image.asset(
@@ -83,7 +82,7 @@ class _HomeState extends State<Home> {
                       child: Container(
                         height: 30,
                         decoration: BoxDecoration(
-                          color: Color(0xFFF8F9FE),
+                          color: Color(0xFFF3E5FF),
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(30),
                             topRight: Radius.circular(30),
@@ -106,10 +105,10 @@ class _HomeState extends State<Home> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Hey, Shivam 👋",
+                                    "Hey, Shivam 🦭",
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 24.0,
+                                      fontSize: 35.0,
                                       fontWeight: FontWeight.bold,
                                       shadows: [
                                         Shadow(
@@ -688,7 +687,7 @@ class CategoryTile extends StatelessWidget {
   final String image,name;
   final bool isSelected;
 
-  CategoryTile({
+  const CategoryTile({
     super.key,
     required this.image,
     this.isSelected = false, required this.name,

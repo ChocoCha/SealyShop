@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:sealyshop/pages/product_detail.dart';
 import 'package:sealyshop/services/database.dart';
 
 class CategoryProduct extends StatefulWidget {
   String category;
-  CategoryProduct({required this.category});
+  CategoryProduct({super.key, required this.category});
 
   @override
   State<CategoryProduct> createState() => _CategoryProductState();
@@ -35,7 +36,7 @@ Widget allProducts(){
 
         return Container(
                       width: 180,
-                      margin: EdgeInsets.only(right: 15.0),
+                      margin: EdgeInsets.only(right: 10.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
@@ -86,7 +87,7 @@ Widget allProducts(){
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 8.0),
+                                SizedBox(height: 50.0),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -98,28 +99,33 @@ Widget allProducts(){
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color(0xFFFF80D3),
-                                            Color(0xFF9458ED),
+                                    GestureDetector(
+                                      onTap: (){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductDetail(detail: ds["Detail"], image: ds["Image"], name: ds["Name"], price: ds["Price"])));
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Color(0xFFFF80D3),
+                                              Color(0xFF9458ED),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color(0xFF9458ED).withOpacity(0.3),
+                                              blurRadius: 8,
+                                              offset: Offset(0, 4),
+                                            ),
                                           ],
                                         ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Color(0xFF9458ED).withOpacity(0.3),
-                                            blurRadius: 8,
-                                            offset: Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                        size: 20,
+                                        child: Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -137,10 +143,10 @@ Widget allProducts(){
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Color(0xFFF8F9FE),
-      appBar: AppBar(backgroundColor:Color(0xFFF8F9FE) ,),
+      backgroundColor:Color(0xFFF3E5FF),
+      appBar: AppBar(backgroundColor:Color(0xFFF3E5FF) ,),
       body: Container(
-        margin: EdgeInsets.only(left: 20.0,right: 20.0,top: 20.0),
+        margin: EdgeInsets.only(left: 20.0,right: 20.0),
         child: Column(
           children: [
             Expanded(child: allProducts())
