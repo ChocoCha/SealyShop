@@ -39,6 +39,8 @@ dependencies:
   shared_preferences: 
   image_picker: 
   firebase_storage: 
+  flutter_stripe:
+  http: 
 
 dev_dependencies:
   flutter_test:

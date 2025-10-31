@@ -19,4 +19,10 @@ class DatabaseMethod{
     return FirebaseFirestore.instance.collection(category).snapshots();
   }
 
+  Future orderDetails(Map<String, dynamic> userInfoMap)async{
+    return await FirebaseFirestore.instance
+      .collection("Orders")
+      .add(userInfoMap);
+  }
+
 }

@@ -129,7 +129,7 @@ class _HomeState extends State<Home> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Hey,"+name!,
+                                    "Hey,${name!}",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 35.0,
@@ -243,7 +243,7 @@ class _HomeState extends State<Home> {
                   ],
                 ),
                 
-                SizedBox(height: 25),
+                SizedBox(height: 30),
                 
                 // Categories Section
                 Padding(
