@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sealyshop/pages/category_products.dart';
+import 'package:sealyshop/services/shared_pref.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -29,6 +30,29 @@ class _HomeState extends State<Home> {
     "Eraser",
   ];
 
+  String? name,image;
+
+  getthesharedpref()async{
+    name= await SharedPreferenceHelper().getUserName();
+    image= await SharedPreferenceHelper().getUserImage();
+    setState(() {
+      
+    });
+  }
+
+  ontheload()async{
+    await getthesharedpref();
+    setState(() {
+      
+    });
+  }
+
+  @override
+  void initState(){
+    ontheload();
+    super.initState();
+  }
+
   int selectedCategoryIndex = -1; // -1 means "All" is selected
 
   @override
@@ -39,7 +63,7 @@ class _HomeState extends State<Home> {
       },
       child: Scaffold(
         backgroundColor: Color(0xFFF3E5FF),
-        body: SafeArea(
+        body: name==null? Center(child: CircularProgressIndicator()): SafeArea(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +129,7 @@ class _HomeState extends State<Home> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Hey, Shivam 🦭",
+                                    "Hey,"+name!,
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 35.0,
@@ -154,8 +178,8 @@ class _HomeState extends State<Home> {
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(35),
-                                  child: Image.asset(
-                                    "images/boy.jpg",
+                                  child: Image.network(
+                                    image!,
                                     height: 60,
                                     width: 60,
                                     fit: BoxFit.cover,
