@@ -97,7 +97,7 @@ ontheload()async{
                           style: AppWidget.boldTextFeildStyle(),
                         ),
                         Text(
-                          "\$${widget.price}",
+                          "\$"+widget.price,
                           style: TextStyle(
                             color: Color(0xFFfd6f36),
                             fontSize: 23.0,
@@ -175,6 +175,7 @@ ontheload()async{
               "Email": mail,
               "Image": image,
               "ProductImage": widget.image,
+              "Status" :"On the way"
             };
             await DatabaseMethod().orderDetails(orderInfoMap);
             showDialog(

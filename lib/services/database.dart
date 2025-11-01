@@ -1,28 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DatabaseMethod{
-
-  Future addUserDetails(Map<String, dynamic> userInfoMap, String id)async{
+class DatabaseMethod {
+  Future addUserDetails(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
-      .collection("users")
-      .doc(id)
-      .set(userInfoMap);
-  }
-  
-  Future AddProduct(Map<String, dynamic> userInfoMap, String categoryname)async{
-    return await FirebaseFirestore.instance
-      .collection(categoryname)
-      .add(userInfoMap);
+        .collection("users")
+        .doc(id)
+        .set(userInfoMap);
   }
 
-  Future<Stream<QuerySnapshot>> getProducts(String category)async{
+  Future AddProduct(
+    Map<String, dynamic> userInfoMap,
+    String categoryname,
+  ) async {
+    return await FirebaseFirestore.instance
+        .collection(categoryname)
+        .add(userInfoMap);
+  }
+
+  Future<Stream<QuerySnapshot>> getProducts(String category) async {
     return FirebaseFirestore.instance.collection(category).snapshots();
   }
 
-  Future orderDetails(Map<String, dynamic> userInfoMap)async{
-    return await FirebaseFirestore.instance
-      .collection("Orders")
-      .add(userInfoMap);
+  Future<Stream<QuerySnapshot>> getOrders(String email) async {
+    return FirebaseFirestore.instance
+        .collection("Orders")
+        .where("Email", isEqualTo: email)
+        .snapshots();
   }
 
+  Future orderDetails(Map<String, dynamic> userInfoMap) async {
+    return await FirebaseFirestore.instance
+        .collection("Orders")
+        .add(userInfoMap);
+  }
 }
