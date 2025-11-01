@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sealyshop/Admin/all_orders.dart';
 
 class DatabaseMethod {
   Future addUserDetails(Map<String, dynamic> userInfoMap, String id) async {
@@ -17,12 +18,26 @@ class DatabaseMethod {
         .add(userInfoMap);
   }
 
+   UpdateStatus(
+  String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Orders").doc(id)
+        .update({"Status": "Delivered"});
+  }
+
   Future<Stream<QuerySnapshot>> getProducts(String category) async {
-    return FirebaseFirestore.instance.collection(category).snapshots();
+    return await FirebaseFirestore.instance.collection(category).snapshots();
+  }
+
+  Future<Stream<QuerySnapshot>> AllOrders() async {
+    return await FirebaseFirestore.instance
+        .collection("Orders")
+        .where("Status", isEqualTo: "On the way")
+        .snapshots();
   }
 
   Future<Stream<QuerySnapshot>> getOrders(String email) async {
-    return FirebaseFirestore.instance
+    return await FirebaseFirestore.instance
         .collection("Orders")
         .where("Email", isEqualTo: email)
         .snapshots();
