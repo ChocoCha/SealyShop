@@ -1,8 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:sealyshop/Admin/add_product.dart';
+import 'package:sealyshop/Admin/admin_login.dart';
 import 'package:sealyshop/Admin/all_orders.dart';
+import 'package:sealyshop/Admin/home_admin.dart';
 import 'package:sealyshop/pages/bottomnav.dart';
+import 'package:sealyshop/pages/home.dart';
 import 'package:sealyshop/pages/signup.dart';
 import 'package:sealyshop/services/constant.dart';
 
@@ -42,7 +46,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: BottomNav(),
+      home: AdminLogin(),
     );
   }
 }
