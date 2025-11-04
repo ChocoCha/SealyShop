@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:sealyshop/pages/product_detail.dart';
 import 'package:sealyshop/services/database.dart';
 
+// ⚠️ ต้องมี support_widget เพื่อใช้งาน AppWidget (สมมติว่าคุณมีไฟล์นี้)
+// import 'package:sealyshop/widget/support_widget.dart'; 
+
 class CategoryProduct extends StatefulWidget {
-  String category;
-  CategoryProduct({super.key, required this.category});
+  final String category;
+  const CategoryProduct({super.key, required this.category});
 
   @override
   State<CategoryProduct> createState() => _CategoryProductState();
@@ -14,142 +17,177 @@ class CategoryProduct extends StatefulWidget {
 class _CategoryProductState extends State<CategoryProduct> {
   Stream? CategoryStream;
 
-  getontheload()async{
-    CategoryStream= await DatabaseMethod().getProducts(widget.category);
-    setState(() {
-      
-    });
-  }
-
-  @override 
-  void initState(){
+  @override
+  void initState() {
     getontheload();
     super.initState();
   }
 
-Widget allProducts(){
-  return StreamBuilder(stream: CategoryStream, builder: (context,AsyncSnapshot snapshot){
-    return snapshot.hasData? GridView.builder(
-      padding: EdgeInsets.zero,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 0.6, mainAxisSpacing: 10.0),itemCount: snapshot.data.docs.length, itemBuilder: (context, index){
-        DocumentSnapshot ds= snapshot.data.docs[index];
+  getontheload() async {
+    // 💡 FIX: ดึงสินค้าตาม Category ที่ส่งมา
+    CategoryStream = await DatabaseMethod().getProducts(widget.category);
+    setState(() {});
+  }
 
-        return Container(
-                      width: 180,
-                      margin: EdgeInsets.only(right: 10.0),
+  Widget allProducts() {
+    return StreamBuilder(
+      stream: CategoryStream,
+      builder: (context, AsyncSnapshot snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.data.docs.isEmpty) {
+          return Center(child: Text("No products found in ${widget.category} category."));
+        }
+        
+        // ⭐️ FIX: ใช้ GridView.builder เพื่อแสดงผลสินค้า
+        return GridView.builder(
+          padding: EdgeInsets.zero,
+          // 💡 กำหนด Layout 2 คอลัมน์ และอัตราส่วนที่เหมาะสม
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.65, 
+            mainAxisSpacing: 15.0,
+            crossAxisSpacing: 15.0,
+          ),
+          itemCount: snapshot.data.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot ds = snapshot.data.docs[index];
+
+            // ⭐️ FIX: หุ้ม Tile ด้วย GestureDetector และใช้ Image.network
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductDetail(
+                      detail: ds["Detail"],
+                      image: ds["Image"],
+                      name: ds["Name"],
+                      price: ds["Price"],
+                      // ⚠️ Note: ProductDetail ควรรับ Product ID ด้วยถ้าจำเป็น
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Image Container
+                    Container(
+                      height: 150,
+                      width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 15,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
+                        color: const Color(0xFFF8F9FE),
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                      child: Center(
+                        child: Image.network(
+                          ds["Image"],
+                          height: 120,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.image_not_supported, size: 50, color: Colors.grey);
+                          },
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 15),
+
+                    // Product Info
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Image Container
-                          Container(
-                            height: 150,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF8F9FE),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(25),
-                                topRight: Radius.circular(25),
-                              ),
+                          Text(
+                            ds["Name"],
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D2D2D),
                             ),
-                            child: Center(
-                              child: Image.network(
-                                ds["Image"],
-                                height: 120,
-                                width: 120,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          
-                          // Product Info
-                          Padding(
-                            padding: EdgeInsets.all(15.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  ds["Name"],
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2D2D2D),
+                          const SizedBox(height: 8.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "\$${ds["Price"]}",
+                                style: const TextStyle(
+                                  color: Color(0xFF9458ED),
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              // 💡 ปุ่ม Add to Cart (Placeholder - ใช้ Logic ใน ProductDetail)
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFFF80D3),
+                                      Color(0xFF9458ED),
+                                    ],
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                SizedBox(height: 50.0),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "\$"+ds["Price"],
-                                      style: TextStyle(
-                                        color: Color(0xFF9458ED),
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: (){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductDetail(detail: ds["Detail"], image: ds["Image"], name: ds["Name"], price: ds["Price"])));
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Color(0xFFFF80D3),
-                                              Color(0xFF9458ED),
-                                            ],
-                                          ),
-                                          borderRadius: BorderRadius.circular(12),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Color(0xFF9458ED).withOpacity(0.3),
-                                              blurRadius: 8,
-                                              offset: Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Icon(
-                                          Icons.add,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                child: const Icon(Icons.add, color: Colors.white, size: 20),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    );
-      }):Container();
-  });
-}
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Color(0xFFF3E5FF),
-      appBar: AppBar(backgroundColor:Color(0xFFF3E5FF) ,),
+      backgroundColor: const Color(0xFFF3E5FF),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF3E5FF),
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          widget.category,
+          style: const TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D2D2D),
+          ),
+        ),
+      ),
       body: Container(
-        margin: EdgeInsets.only(left: 20.0,right: 20.0),
+        margin: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           children: [
-            Expanded(child: allProducts())
+            Expanded(child: allProducts()),
           ],
         ),
       ),

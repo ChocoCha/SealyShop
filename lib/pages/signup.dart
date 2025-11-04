@@ -24,40 +24,63 @@ class _SignUpState extends State<SignUp> {
   final _formkey= GlobalKey<FormState>();
 
   registration()async{
-    if(password!=null && name!=null && email!=null){
-      try{
-        UserCredential userCredential= await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email!, password: password!);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.redAccent,
-          content: Text("Resgistered Succesfully",style: TextStyle(fontSize: 20.0),)));
-          String Id= randomAlphaNumeric(10);
-          await SharedPreferenceHelper().saveUserEmail(mailcontroller.text);
-          await SharedPreferenceHelper().saveUserId(Id);
-          await SharedPreferenceHelper().saveUserName(namecontroller.text);
-          await SharedPreferenceHelper().saveUserImage("https://cdn-icons-png.freepik.com/512/9368/9368284.png");
-          Map<String, dynamic> userInfoMap={
-            "Name" : namecontroller.text,
-            "Email" : mailcontroller.text,
-            "Id" : Id,
-              "Image":
-                "https://cdn-icons-png.freepik.com/512/9368/9368284.png"
-          };
-          await DatabaseMethod().addUserDetails(userInfoMap, Id);
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomNav()));
-      } on FirebaseException catch(e){
-        if(e.code=='weak'){
-           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.redAccent,
-          content: Text("Password Provided is too Weak",style: TextStyle(fontSize: 20.0),)));
-        }
-        else if(e.code=="email-already-in-use"){
-           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.redAccent,
-          content: Text("Account Already exsists",style: TextStyle(fontSize: 20.0),)));
-        }
+  if(_formkey.currentState!.validate()){
+    setState(() {
+      name = namecontroller.text;
+      email = mailcontroller.text;
+      password = passwordcontroller.text;
+    });
+    
+    // 💡 URL ภาพ Default
+    const String defaultImageUrl = "https://cdn-icons-png.freepik.com/512/9368/9368284.png";
+
+    try{
+      // 1. สร้าง User ด้วย Firebase Auth
+      UserCredential userCredential= await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email!, password: password!);
+      
+      // ⭐️ FIX 1: ดึง UID จริงจาก UserCredential
+      String trueUid = userCredential.user!.uid; 
+      
+      // 2. บันทึก UID จริงลงใน Shared Prefs
+      await SharedPreferenceHelper().saveUserEmail(mailcontroller.text);
+      await SharedPreferenceHelper().saveUserId(trueUid); // 🎯 FIX: ใช้ trueUid
+      await SharedPreferenceHelper().saveUserName(namecontroller.text);
+      await SharedPreferenceHelper().saveUserImage(defaultImageUrl); // บันทึกรูปภาพ Default
+      await SharedPreferenceHelper().saveUserAddress(""); // 💡 NEW: บันทึก Address ว่าง
+
+      // 3. เตรียม Map ข้อมูลที่ถูกต้อง
+      Map<String, dynamic> userInfoMap={
+        "Name" : namecontroller.text,
+        "Email" : mailcontroller.text,
+        "Id" : trueUid, // 🎯 FIX: ใช้ trueUid เป็น Document Key ภายใน Map
+        "Image": defaultImageUrl,
+        "Address": "" // 💡 เพิ่ม Address ว่าง
+      };
+      
+      // 4. บันทึกเข้า Firestore ด้วย UID จริง (เป็น Document ID)
+      await DatabaseMethod().addUserDetails(userInfoMap, trueUid); // 🎯 FIX: ใช้ trueUid
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.green,
+        content: Text("Registered Successfully",style: TextStyle(fontSize: 20.0),)));
+
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> const BottomNav()));
+      
+    } on FirebaseException catch(e){
+      // ... (Error Handling เดิม)
+      if(e.code=='weak'){
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text("Password Provided is too Weak",style: TextStyle(fontSize: 20.0),)));
+      }
+      else if(e.code=="email-already-in-use"){
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text("Account Already exists",style: TextStyle(fontSize: 20.0),)));
       }
     }
   }
+}
 
 
   
@@ -254,8 +277,24 @@ class _SignUpState extends State<SignUp> {
                           if(value==null|| value.isEmpty){
                             return'Please enter your Password';
                           }
-                          return null;
-                        },
+                          // ต้องมีความยาว 8 ตัวเป็นอย่างน้อย
+                            if (value.length < 8) {
+                                return 'Password must be at least 8 characters long.';
+                            }
+                            
+                            // ต้องมีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว
+                            if (!value.contains(RegExp(r'[A-Z]'))) {
+                                return 'Password must contain at least one uppercase letter.';
+                            }
+                            
+                            // ต้องมีตัวเลขอย่างน้อย 1 ตัว
+                            if (!value.contains(RegExp(r'[0-9]'))) {
+                                return 'Password must contain at least one number.';
+                            }
+
+                            return null; // ผ่านการตรวจสอบ
+                            },
+                        
                         controller: passwordcontroller,
                         obscureText: true,
                         style: TextStyle(fontSize: 16.0),
@@ -276,10 +315,7 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                     ),
-                    
-                    
-                    
-                    
+          
                     SizedBox(height: 30.0),
                     
                     // Signup Button

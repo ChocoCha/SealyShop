@@ -6,6 +6,7 @@ class SharedPreferenceHelper{
   static String userNamekey= "USERNAMEKEY";
   static String userEmailkey= "USEREMAILKEY";
   static String userImagekey= "USERIMAGEKEY";
+  static String userAddressKey = "USERADDRESSKEY";
 
   Future<bool> saveUserId(String getUserId)async{
     SharedPreferences prefs= await SharedPreferences.getInstance();
@@ -27,6 +28,11 @@ class SharedPreferenceHelper{
     return prefs.setString(userImagekey, getUserImage);
   }
 
+  Future<bool> saveUserAddress(String getUserAddress) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString(userAddressKey, getUserAddress);
+  }
+
   Future<String?> getUserId()async{
     SharedPreferences prefs= await SharedPreferences.getInstance();
     return prefs.getString(userIdkey);
@@ -46,5 +52,20 @@ class SharedPreferenceHelper{
     SharedPreferences prefs= await SharedPreferences.getInstance();
     return prefs.getString(userImagekey);
   }
-  
+
+  Future<String?> getUserAddress() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(userAddressKey);
+  }
+
+  // ✅ ฟังก์ชันเคลียร์ข้อมูลเวลา Logout
+  Future<void> clearUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(userIdkey);
+    await prefs.remove(userNamekey);
+    await prefs.remove(userEmailkey);
+    await prefs.remove(userImagekey);
+    await prefs.remove(userAddressKey);
+    // หรือใช้ prefs.clear(); เพื่อเคลียร์ทุก key ในแอป
+  }
 }
