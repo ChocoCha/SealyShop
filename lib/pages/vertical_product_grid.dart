@@ -81,6 +81,7 @@ class ProductItemCard extends StatelessWidget {
               image: imagePath,
               name: name,
               price: price,
+              
             ),
           ),
         );

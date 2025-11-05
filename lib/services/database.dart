@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sealyshop/Admin/all_orders.dart';
 
 class DatabaseMethod {
+
+  
   // =================================================================
   // 💡 NEW: CART METHODS
   // =================================================================
@@ -150,6 +152,14 @@ class DatabaseMethod {
         .collection("Orders")
         .add(userInfoMap);
   }
+
+  Future<Stream<QuerySnapshot>> getDeliveredOrders(String email) async {
+    return FirebaseFirestore.instance
+        .collection("Orders")
+        .where("Email", isEqualTo: email)
+        .where("Status", isEqualTo: "Delivered") // ⭐️ กรองสถานะ Delivered
+        .snapshots();
+}
 
   Future<QuerySnapshot> search(String updatedname) async {
     return await FirebaseFirestore.instance

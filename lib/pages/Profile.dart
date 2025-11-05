@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
+import 'package:sealyshop/pages/DeliveredOrdersHistory.dart';
 import 'package:sealyshop/pages/edit_profile.dart';
 import 'package:sealyshop/pages/onboarding.dart';
 import 'package:sealyshop/services/auth.dart';
@@ -253,6 +254,25 @@ class _ProfileState extends State<Profile> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const EditProfilePage(),
+                              ),
+                            );
+                            getthesharedpref();
+                          },
+                        ),
+
+                        SizedBox(height: 15),
+
+                        //orders
+                        _buildProfileCard(
+                          context,
+                          label: "Order History",
+                          value:"Your Order history here",
+                          icon: Icons.shopping_bag_outlined,
+                          onEdit: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DeliveredOrdersHistory(),
                               ),
                             );
                             getthesharedpref();

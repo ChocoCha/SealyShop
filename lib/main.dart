@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sealyshop/Admin/home_admin.dart';
+import 'package:sealyshop/pages/DeliveredOrdersHistory.dart';
 import 'package:sealyshop/pages/bottomnav.dart';
 import 'package:sealyshop/pages/home.dart';
 import 'package:sealyshop/pages/login.dart';
@@ -21,6 +23,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate, // การแปลสำหรับ Material Widgets (เช่น Date Picker)
+        GlobalWidgetsLocalizations.delegate, // การแปลสำหรับ Text Direction (LTR/RTL)
+        GlobalCupertinoLocalizations.delegate, // สำหรับ iOS
+        // ถ้าคุณมีการแปลเอง (Custom Translation) ให้เพิ่ม Delegate ของคุณที่นี่
+      ],
+      supportedLocales: const [
+        Locale('en', ''), // English (อังกฤษ)
+        Locale('th', ''), // Thai (ไทย) ⭐️
+        // เพิ่มภาษาอื่นๆ ที่คุณต้องการรองรับ
+      ],
       title: 'Sealy Shop',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
