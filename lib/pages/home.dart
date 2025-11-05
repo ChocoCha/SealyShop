@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sealyshop/common/widgets/images/image_string.dart';
+import 'package:sealyshop/pages/all_products.dart';
 import 'package:sealyshop/pages/category_products.dart';
 import 'package:sealyshop/pages/chat_screen.dart';
 import 'package:sealyshop/pages/product_detail.dart';
@@ -279,7 +280,7 @@ class _HomeState extends State<Home> {
                                           int cartCount = snapshot.hasData
                                               ? snapshot.data!.docs.length
                                               : 0;
-                                          return _buildCartIcon(cartCount);
+                                          return _buildCartIcon(context,cartCount);
                                         },
                                       ),
                                     ],
@@ -435,17 +436,7 @@ class _HomeState extends State<Home> {
                                   color: Color(0xFF2D2D2D),
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  "See all",
-                                  style: TextStyle(
-                                    color: Color(0xFF9458ED),
-                                    fontSize: 15.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
+                              
                             ],
                           ),
                         ),
@@ -491,28 +482,33 @@ class _HomeState extends State<Home> {
                                       ),
                                     ],
                                   ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.apps,
-                                        color: selectedCategoryIndex == -1
-                                            ? Colors.white
-                                            : Color(0xFF9458ED),
-                                        size: 32,
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        "All",
-                                        style: TextStyle(
+                                  child: GestureDetector(
+                                    onTap:() {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=> AllProducts()));
+                                    } ,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.apps,
                                           color: selectedCategoryIndex == -1
                                               ? Colors.white
-                                              : Color(0xFF2D2D2D),
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.w600,
+                                              : Color(0xFF9458ED),
+                                          size: 32,
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(height: 8),
+                                        Text(
+                                          "All",
+                                          style: TextStyle(
+                                            color: selectedCategoryIndex == -1
+                                                ? Colors.white
+                                                : Color(0xFF2D2D2D),
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -612,30 +608,9 @@ class _HomeState extends State<Home> {
                             },
                       ),
                     ),
-                    const SizedBox(height: 20.0),
+                    const SizedBox(height: 15.0),
                     // --- All Stationery (Vertical Grid) ---
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: const Text(
-                "All Stationery",
-                style: TextStyle(
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D2D2D),
-                ),
-              ),
-            ),
-            const SizedBox(height: 15.0),
-                    // ⭐️ NEW: Vertical Grid View (เรียงลงมา)
-                    // 💡 ถ้า productStream เป็น null จะแสดง CircularProgressIndicator ในไฟล์ VerticalProductGrid.dart
-                    productStream == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : VerticalProductGrid(
-                            productStream:
-                                productStream, // ใช้ Stream ที่แก้ไขแล้ว
-                          ),
-
-                    const SizedBox(height: 30.0),
+            
                   ],
                 ),
               ),
@@ -716,11 +691,11 @@ class _HomeState extends State<Home> {
                 children: [
                   Text(
                     name,
-                    // ... (Style code)
+                    
                   ),
                   SizedBox(
                     height: 8.0,
-                  ), // เปลี่ยนจาก 50.0 เป็น 8.0 เพื่อให้สวยงามขึ้น
+                  ), 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -777,7 +752,7 @@ class _HomeState extends State<Home> {
               ),
             ),
             SizedBox(width: 20.0),
-            Text(data["Name"], style: AppWidget.semiboldTextFeildStyle()),
+            Flexible(child: Text(data["Name"], style: AppWidget.semiboldTextFeildStyle())),
           ],
         ),
       ),
@@ -874,11 +849,10 @@ Widget _buildHeaderIcon({
 }
 
 // 💡 NEW: Helper Widget สำหรับ Cart Icon ที่มี Badge
-Widget _buildCartIcon(int cartCount) {
+Widget _buildCartIcon(BuildContext context, int cartCount) {
   return GestureDetector(
     onTap: () {
-      // ⚠️ FIX: Cart อยู่ใน BottomNav แล้ว ไม่ต้อง push/pop
-      // Navigator.push(context, MaterialPageRoute(builder: (context) => Cart()));
+       Navigator.push(context, MaterialPageRoute(builder: (context) => Cart()));
     },
     child: Container(
       margin: const EdgeInsets.only(right: 15),

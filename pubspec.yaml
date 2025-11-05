@@ -44,6 +44,8 @@ dependencies:
   firebase_storage: 
   flutter_stripe:
   http: 
+  flutter_dotenv: ^5.1.0
+  flutter_launcher_icons: ^0.13.1
 
   uuid: ^4.5.1
 
@@ -83,6 +85,15 @@ flutter:
     - "images/paper.png"
     - "images/eraser.png"
   #   - images/a_dot_ham.jpeg
+
+
+flutter_launcher_icons:
+  # ตั้งค่าชื่อไฟล์รูปภาพที่คุณเตรียมไว้
+  image_path: "assets/icon/app-icon.png" # ⭐️ เปลี่ยนเส้นทางนี้
+  
+  # กำหนดว่าจะสร้างไอคอนสำหรับแพลตฟอร์มใดบ้าง
+  android: true
+  ios: true
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

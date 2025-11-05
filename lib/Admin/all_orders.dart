@@ -447,7 +447,7 @@ class _AllOrdersState extends State<AllOrders> {
                                     onTap: () => _markAsDone(ds.id),
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
-                                        horizontal: 20,
+                                        horizontal: 15,
                                         vertical: 12,
                                       ),
                                       decoration: BoxDecoration(

@@ -24,7 +24,7 @@ class Onboarding extends StatefulWidget{
                   "Explore \nThe Best \nProducts.",//ยินดีต้อนรับสู่ร้านต้นไม้ของเรา
                   style: TextStyle(
                     color: 
-                    Colors.black,
+                    const Color.fromARGB(255, 0, 0, 0),
                     fontSize: 50.0,
                     fontWeight: FontWeight.bold
                     ),
@@ -41,7 +41,7 @@ class Onboarding extends StatefulWidget{
                     Container(
                       margin: EdgeInsets.only(right: 20.0),
                       padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(color:Colors.black,shape: BoxShape.circle),
+                      decoration: BoxDecoration(color:Color.fromARGB(255, 90, 16, 119),shape: BoxShape.circle),
                       child: Text(
                         "Next",
                         style: TextStyle(

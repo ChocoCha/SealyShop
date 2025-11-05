@@ -196,25 +196,7 @@ class _ProductDetailState extends State<ProductDetail> {
                             ),
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.favorite_border,
-                            color: Color(0xFF9458ED),
-                            size: 22,
-                          ),
-                        ),
+                        
                       ],
                     ),
                   ),
@@ -226,11 +208,11 @@ class _ProductDetailState extends State<ProductDetail> {
                     tag: 'product_${widget.name}',
                     child: Image.network(
                       widget.image,
-                      height: 300,
+                      height: 200,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return SizedBox(
-                          height: 300,
+                          height: 200,
                           child: Icon(
                             Icons.image_not_supported_outlined,
                             size: 100,
@@ -506,13 +488,13 @@ class _ProductDetailState extends State<ProductDetail> {
 
           // Bottom Buttons
           Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
+                  blurRadius: 30,
                   offset: Offset(0, -5),
                 ),
               ],
@@ -536,26 +518,28 @@ class _ProductDetailState extends State<ProductDetail> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Total Price",
-                              style: TextStyle(
-                                fontSize: 13.0,
-                                color: Colors.grey[600],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Total Price",
+                                style: TextStyle(
+                                  fontSize: 13.0,
+                                  color: Colors.grey[600],
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              "\$${(double.tryParse(widget.price) ?? 0.0) * selectedQuantity}",
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF9458ED),
+                              SizedBox(height: 4),
+                              Text(
+                                "\$${((double.tryParse(widget.price) ?? 0.0) * selectedQuantity).toStringAsFixed(2)}",
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF9458ED),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(

@@ -2,20 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sealyshop/pages/product_detail.dart';
 import 'package:sealyshop/services/database.dart';
+// ⚠️ อย่าลืม import support_widget.dart ถ้าคุณต้องการใช้ AppWidget
 
-// ⚠️ ต้องมี support_widget เพื่อใช้งาน AppWidget (สมมติว่าคุณมีไฟล์นี้)
-// import 'package:sealyshop/widget/support_widget.dart'; 
-
-class CategoryProduct extends StatefulWidget {
-  final String category;
-  const CategoryProduct({super.key, required this.category});
+class AllProducts extends StatefulWidget { // 💡 เปลี่ยนชื่อคลาส
+  const AllProducts({super.key});
 
   @override
-  State<CategoryProduct> createState() => _CategoryProductState();
+  State<AllProducts> createState() => _AllProductsState();
 }
 
-class _CategoryProductState extends State<CategoryProduct> {
-  Stream? CategoryStream;
+class _AllProductsState extends State<AllProducts> {
+  Stream<QuerySnapshot>? productStream; // 💡 เปลี่ยนชื่อตัวแปรให้สื่อถึงสินค้าทั้งหมด
 
   @override
   void initState() {
@@ -24,26 +21,32 @@ class _CategoryProductState extends State<CategoryProduct> {
   }
 
   getontheload() async {
-    // 💡 FIX: ดึงสินค้าตาม Category ที่ส่งมา
-    CategoryStream = await DatabaseMethod().getProducts(widget.category);
+    // ⭐️ FIX: เรียกใช้เมธอด getAllProducts() จาก DatabaseMethod
+    // (ซึ่งเมธอดนี้ควรคืนค่า Stream<QuerySnapshot> ของสินค้าทั้งหมดจาก Collection "Products")
+    productStream = await DatabaseMethod().getAllProducts();
     setState(() {});
   }
 
-  Widget allProducts() {
-    return StreamBuilder(
-      stream: CategoryStream,
-      builder: (context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) {
+  Widget buildAllProductsGrid() { // 💡 เปลี่ยนชื่อเมธอด
+    return StreamBuilder<QuerySnapshot>( // กำหนด Type ให้ชัดเจน
+      stream: productStream, // ใช้ Stream ที่ดึงสินค้าทั้งหมด
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (snapshot.data.docs.isEmpty) {
-          return Center(child: Text("No products found in ${widget.category} category."));
+        if (snapshot.hasError) {
+           return Center(child: Text("Error loading products: ${snapshot.error}"));
         }
         
-        // ⭐️ FIX: ใช้ GridView.builder เพื่อแสดงผลสินค้า
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text("No products found in the shop."));
+        }
+        
+        // ⭐️ ใช้ GridView.builder เพื่อแสดงผลสินค้า
         return GridView.builder(
           padding: EdgeInsets.zero,
+          physics: const BouncingScrollPhysics(), // ทำให้ Scroll Smooth ขึ้น
           // 💡 กำหนด Layout 2 คอลัมน์ และอัตราส่วนที่เหมาะสม
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
@@ -51,11 +54,11 @@ class _CategoryProductState extends State<CategoryProduct> {
             mainAxisSpacing: 15.0,
             crossAxisSpacing: 15.0,
           ),
-          itemCount: snapshot.data.docs.length,
+          itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
-            DocumentSnapshot ds = snapshot.data.docs[index];
+            DocumentSnapshot ds = snapshot.data!.docs[index];
 
-            // ⭐️ FIX: หุ้ม Tile ด้วย GestureDetector และใช้ Image.network
+            // ⭐️ Product Tile Widget (อ้างอิงจากโค้ด CategoryProduct เดิม)
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -66,7 +69,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                       image: ds["Image"],
                       name: ds["Name"],
                       price: ds["Price"],
-                      // ⚠️ Note: ProductDetail ควรรับ Product ID ด้วยถ้าจำเป็น
+                      // เพิ่ม Product ID ถ้าต้องการ: id: ds.id
                     ),
                   ),
                 );
@@ -137,7 +140,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              // 💡 ปุ่ม Add to Cart (Placeholder - ใช้ Logic ใน ProductDetail)
+                              // ปุ่ม Add to Cart
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
@@ -174,9 +177,9 @@ class _CategoryProductState extends State<CategoryProduct> {
         backgroundColor: const Color(0xFFF3E5FF),
         elevation: 0,
         centerTitle: true,
-        title: Text(
-          widget.category,
-          style: const TextStyle(
+        title: const Text( // 💡 เปลี่ยน Title เป็น "All Products"
+          "All Products",
+          style: TextStyle(
             fontSize: 24.0,
             fontWeight: FontWeight.bold,
             color: Color(0xFF2D2D2D),
@@ -187,7 +190,7 @@ class _CategoryProductState extends State<CategoryProduct> {
         margin: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           children: [
-            Expanded(child: allProducts()),
+            Expanded(child: buildAllProductsGrid()), // 💡 ใช้เมธอดใหม่
           ],
         ),
       ),

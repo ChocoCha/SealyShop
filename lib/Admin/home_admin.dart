@@ -76,99 +76,103 @@ void _adminSignOut() async {
                 children: [
                   // Top Bar
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Product Manager",
-                            style: TextStyle(
-                              fontSize: 26.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            "Manage your inventory",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          // Add Product Button
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      AddProduct(productToEdit: null),
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Product Manager",
+                                style: TextStyle(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
-                              ).then((_) => _loadAllProducts());
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(
-                                Icons.add_circle_outline,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 5),
-                          // All Orders Button
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AllOrders(),
+                              SizedBox(height: 4),
+                              Text(
+                                "Manage inventory",
+                                style: TextStyle(
+                                  fontSize: 13.0,
+                                  color: Colors.white.withOpacity(0.9),
                                 ),
-                              );
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(
-                                Icons.shopping_bag_outlined,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
+                            ],
                           ),
-                          SizedBox(width: 5),
-                        GestureDetector(
-                         onTap: _adminSignOut,
-                         child: Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                           color: Colors.white.withOpacity(0.2),
-                           borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                           Icons.logout,
-                           color: Colors.white,
-                           size: 24,
-                          ),
-                         ),
                         ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Add Product Button
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        AddProduct(productToEdit: null),
+                                  ),
+                                ).then((_) => _loadAllProducts());
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  Icons.add_circle_outline,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            // All Orders Button
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AllOrders(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  Icons.shopping_bag_outlined,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            // Logout Button
+                            GestureDetector(
+                              onTap: _adminSignOut,
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  Icons.logout,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   
                   SizedBox(height: 20),
                   
@@ -475,7 +479,7 @@ void _adminSignOut() async {
             Text(
               label,
               style: TextStyle(
-                fontSize: 13.0,
+                fontSize: 10.0,
                 fontWeight: FontWeight.w600,
                 color: isSelected ? Colors.white : Color(0xFF2D2D2D),
               ),
