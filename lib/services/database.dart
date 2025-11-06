@@ -108,6 +108,52 @@ class DatabaseMethod {
       .delete();
 }
 
+  // ลดสต็อคของสินค้าโดยใช้ชื่อสินค้าเป็นตัวค้นหา
+  // จะลดทั้งใน Collection 'Products' และใน Collection ของ Category ที่ระบุ (ถ้ามี)
+  Future<void> decrementStockByName(String name, int quantity) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('Products')
+          .where('Name', isEqualTo: name)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data();
+        String stockStr = data['Stock']?.toString() ?? '0';
+        int stock = int.tryParse(stockStr) ?? 0;
+        int newStock = stock - quantity;
+        if (newStock < 0) newStock = 0;
+
+        // Update main Products collection
+        await FirebaseFirestore.instance
+            .collection('Products')
+            .doc(doc.id)
+            .update({'Stock': newStock.toString()});
+
+        // If this product has a Category field, also update that category collection's document (if exists)
+        String? category = data['Category']?.toString();
+        if (category != null && category.isNotEmpty) {
+          try {
+            DocumentReference categoryDoc = FirebaseFirestore.instance
+                .collection(category)
+                .doc(doc.id);
+            DocumentSnapshot catSnap = await categoryDoc.get();
+            if (catSnap.exists) {
+              await categoryDoc.update({'Stock': newStock.toString()});
+            }
+          } catch (e) {
+            // Ignore category update failures to avoid blocking order flow
+            print('Failed to update stock in category collection: $e');
+          }
+        }
+      }
+    } catch (e) {
+      print('decrementStockByName error: $e');
+      rethrow;
+    }
+  }
+
   // =================================================================
   // ✅ EXISTING METHODS (จากโค้ดเดิมของคุณ)
   // =================================================================

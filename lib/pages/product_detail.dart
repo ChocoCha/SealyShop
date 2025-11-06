@@ -712,7 +712,29 @@ class _ProductDetailState extends State<ProductDetail> {
   // Backend functions - ไม่แก้ไขเลย
   Future<void> makePayment(String amount) async {
     try {
+      // Basic validation: Stripe generally requires amount >= 1 (in major currency units)
+      double numericAmount = double.tryParse(amount) ?? 0.0;
+      if (numericAmount < 1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Payment amount must be at least 1')),
+        );
+        return;
+      }
+
       paymentIntent = await createPaymentIntent(amount, 'USD');
+
+      // If paymentIntent is null or missing client_secret, show error to help debugging
+      if (paymentIntent == null || paymentIntent?['client_secret'] == null) {
+        String body = paymentIntent == null ? 'No response from payment server' : paymentIntent.toString();
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Payment Error'),
+            content: Text(body),
+          ),
+        );
+        return;
+      }
       await Stripe.instance
           .initPaymentSheet(
             paymentSheetParameters: SetupPaymentSheetParameters(
@@ -726,6 +748,9 @@ class _ProductDetailState extends State<ProductDetail> {
       displayPaymentSheet();
     } catch (e, s) {
       print('exception:$e$s');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Payment initialization failed: $e')),
+      );
     }
   }
 
@@ -742,6 +767,13 @@ class _ProductDetailState extends State<ProductDetail> {
           "Status": "On the way"
         };
         await DatabaseMethod().orderDetails(orderInfoMap);
+        // ลดสต็อคสินค้าหลังการชำระเงินสำเร็จ (ใช้ชื่อสินค้าเป็นตัวค้นหา)
+        try {
+          await DatabaseMethod().decrementStockByName(widget.name, selectedQuantity);
+        } catch (e) {
+          // ถ้าการอัปเดตสต็อคล้มเหลว ให้บันทึกไว้ใน log แต่ไม่ขัดขวาง flow ของผู้ใช้
+          print('Failed to decrement stock for ${widget.name}: $e');
+        }
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
@@ -789,9 +821,14 @@ class _ProductDetailState extends State<ProductDetail> {
         },
         body: body,
       );
+      // If Stripe returns an error status, surface it for debugging
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        print('Stripe createPaymentIntent failed: ${response.statusCode} ${response.body}');
+      }
       return jsonDecode(response.body);
     } catch (err) {
       print('err charging user: ${err.toString()}');
+      return null;
     }
   }
 
