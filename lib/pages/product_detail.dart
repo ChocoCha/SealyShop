@@ -6,7 +6,6 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sealyshop/services/constant.dart';
 import 'package:sealyshop/services/database.dart';
 import 'package:sealyshop/services/shared_pref.dart';
-import 'package:sealyshop/widget/support_widget.dart';
 import 'package:http/http.dart' as http;
 
 class ProductDetail extends StatefulWidget {
@@ -164,7 +163,7 @@ class _ProductDetailState extends State<ProductDetail> {
                   ),
                 ),
 
-                // Back Button and Favorite
+                // Back Button 
                 SafeArea(
                   child: Padding(
                     padding:

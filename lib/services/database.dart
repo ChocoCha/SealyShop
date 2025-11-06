@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sealyshop/Admin/all_orders.dart';
 
 class DatabaseMethod {
 
   
+
+
   // =================================================================
   // 💡 NEW: CART METHODS
   // =================================================================
@@ -49,6 +50,7 @@ class DatabaseMethod {
     return FirebaseFirestore.instance.collection("Products").snapshots();
   }
 
+  // 1. เพิ่มสินค้าไปยังตะกร้า
   Future<void> addProductToCart(
     String userId,
     String productId,

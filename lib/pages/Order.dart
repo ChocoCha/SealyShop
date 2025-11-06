@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sealyshop/pages/bottomnav.dart';
-import 'package:sealyshop/pages/product_detail.dart';
 import 'package:sealyshop/services/database.dart';
 import 'package:sealyshop/services/shared_pref.dart';
-import 'package:sealyshop/widget/support_widget.dart';
 
 class Order extends StatefulWidget {
   const Order({super.key});

@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
 import 'package:sealyshop/pages/bottomnav.dart';
 import 'package:sealyshop/pages/login.dart';
 import 'package:sealyshop/services/database.dart';

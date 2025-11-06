@@ -8,7 +8,6 @@ import 'package:sealyshop/pages/all_products.dart';
 import 'package:sealyshop/pages/category_products.dart';
 import 'package:sealyshop/pages/chat_screen.dart';
 import 'package:sealyshop/pages/product_detail.dart';
-import 'package:sealyshop/pages/vertical_product_grid.dart';
 import 'package:sealyshop/services/database.dart';
 import 'package:sealyshop/services/shared_pref.dart';
 import 'package:sealyshop/widget/promo_slider.dart';

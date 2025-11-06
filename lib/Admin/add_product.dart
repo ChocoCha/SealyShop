@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 import 'package:sealyshop/services/database.dart';
-import 'package:sealyshop/widget/support_widget.dart'; // สมมติว่า AppWidget มาจากที่นี่
 
 class AddProduct extends StatefulWidget {
   // 💡 1. รับ DocumentSnapshot สำหรับโหมดแก้ไข

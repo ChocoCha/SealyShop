@@ -7,6 +7,7 @@ import 'package:sealyshop/pages/DeliveredOrdersHistory.dart';
 import 'package:sealyshop/pages/bottomnav.dart';
 import 'package:sealyshop/pages/home.dart';
 import 'package:sealyshop/pages/login.dart';
+import 'package:sealyshop/pages/onboarding.dart';
 import 'package:sealyshop/services/constant.dart';
 
 void main()async {
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home:LogIn(),
+      home: Onboarding(),
     );
   }
 }
