@@ -154,6 +154,47 @@ class DatabaseMethod {
     }
   }
 
+  // ลดสต็อคของสินค้าโดยใช้ document ID (แนะนำให้ใช้เมธอดนี้เมื่อมี productId)
+  Future<void> decrementStockById(String productId, int quantity) async {
+    try {
+      DocumentReference<Map<String, dynamic>> prodRef = FirebaseFirestore
+          .instance
+          .collection('Products')
+          .doc(productId);
+
+      DocumentSnapshot<Map<String, dynamic>> prodSnap = await prodRef.get();
+      if (!prodSnap.exists) return;
+
+      Map<String, dynamic>? data = prodSnap.data();
+      String stockStr = data?['Stock']?.toString() ?? '0';
+      int stock = int.tryParse(stockStr) ?? 0;
+      int newStock = stock - quantity;
+      if (newStock < 0) newStock = 0;
+
+      // Update main Products collection
+      await prodRef.update({'Stock': newStock.toString()});
+
+      // If product has Category field, also update that collection's document (if exists)
+      String? category = data?['Category']?.toString();
+      if (category != null && category.isNotEmpty) {
+        try {
+          DocumentReference categoryDoc = FirebaseFirestore.instance
+              .collection(category)
+              .doc(productId);
+          DocumentSnapshot catSnap = await categoryDoc.get();
+          if (catSnap.exists) {
+            await categoryDoc.update({'Stock': newStock.toString()});
+          }
+        } catch (e) {
+          print('Failed to update stock in category collection: $e');
+        }
+      }
+    } catch (e) {
+      print('decrementStockById error: $e');
+      rethrow;
+    }
+  }
+
   // =================================================================
   // ✅ EXISTING METHODS (จากโค้ดเดิมของคุณ)
   // =================================================================

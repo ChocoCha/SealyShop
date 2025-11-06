@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart' ;
 import 'package:flutter_stripe/flutter_stripe.dart' hide Card;
 import 'package:sealyshop/services/database.dart';
+import 'package:sealyshop/pages/bottomnav.dart';
 import 'package:sealyshop/services/shared_pref.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
@@ -206,15 +207,38 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     try {
       await DatabaseMethod().saveOrder(orderInfo);
-      
+
+      // ลดสต็อคสำหรับแต่ละสินค้าโดยใช้ productId (doc.id)
+      for (var doc in widget.cartItems) {
+        try {
+          int quantity = int.tryParse(doc['Quantity']?.toString() ?? '1') ?? 1;
+          // Cart documents use a cart-specific id (often based on product name) so
+          // decrement by product Name to find the product document in 'Products'
+          String productName = doc['Name']?.toString() ?? '';
+          if (productName.isNotEmpty) {
+            await DatabaseMethod().decrementStockByName(productName, quantity);
+          } else {
+            // Fallback to attempting by doc id
+            await DatabaseMethod().decrementStockById(doc.id, quantity);
+          }
+        } catch (e) {
+          print('Failed to decrement stock for cart item ${doc.id}: $e');
+        }
+      }
+
       List<String> docIds = widget.cartItems.map((doc) => doc.id).toList();
       await DatabaseMethod().clearCart(userId!, docIds);
-      
+
       if(mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Order placed successfully! Order ID: $orderId')),
         );
-        Navigator.popUntil(context, (route) => route.isFirst);
+        // นำทางไปยัง BottomNav และล้าง stack (ให้ผู้ใช้กลับไปหน้า main)
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const BottomNav()),
+          (route) => false,
+        );
       }
     } catch (e) {
       print('Order placement failed: $e');

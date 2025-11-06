@@ -686,7 +686,7 @@ class CartItemTile extends StatelessWidget {
                       ),
                       SizedBox(width: 10),
                       Text(
-                        "\$${price.toStringAsFixed(2)} each",
+                        "\$${price.toStringAsFixed(2)} ",
                         style: TextStyle(
                           fontSize: 12.0,
                           color: Colors.grey[600],
