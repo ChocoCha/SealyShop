@@ -262,20 +262,20 @@ class _ProfileState extends State<Profile> {
 
                         SizedBox(height: 15),
 
-                        //orders
-                        _buildProfileCard(
+                        // Order History Button
+                        _buildActionButton(
                           context,
-                          label: "Order History",
-                          value:"Your Order history here",
                           icon: Icons.shopping_bag_outlined,
-                          onEdit: () async {
-                            await Navigator.push(
+                          label: "Order History",
+                          subtitle: "View your past orders",
+                          color: Color(0xFF9458ED),
+                          onTap: () {
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const DeliveredOrdersHistory(),
                               ),
                             );
-                            getthesharedpref();
                           },
                         ),
 

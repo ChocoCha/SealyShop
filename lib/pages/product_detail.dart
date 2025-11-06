@@ -7,9 +7,10 @@ import 'package:sealyshop/services/constant.dart';
 import 'package:sealyshop/services/database.dart';
 import 'package:sealyshop/services/shared_pref.dart';
 import 'package:http/http.dart' as http;
+import 'package:sealyshop/pages/bottomnav.dart';
 
 class ProductDetail extends StatefulWidget {
-  String image, name, detail, price;
+  final String image, name, detail, price;
   ProductDetail({
     super.key,
     required this.detail,
@@ -774,22 +775,28 @@ class _ProductDetailState extends State<ProductDetail> {
           // ถ้าการอัปเดตสต็อคล้มเหลว ให้บันทึกไว้ใน log แต่ไม่ขัดขวาง flow ของผู้ใช้
           print('Failed to decrement stock for ${widget.name}: $e');
         }
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.green),
-                    Text("Payment Succesfull"),
-                  ],
-                ),
-              ],
+        // แสดง SnackBar แล้วนำทางไปยัง BottomNav
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Color(0xFF9458ED),
+              behavior: SnackBarBehavior.floating,
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 10),
+                  Text("Payment Successful"),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+          // ล้าง navigation stack และไปที่ BottomNav
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => BottomNav()),
+            (route) => false,
+          );
+        }
         paymentIntent = null;
       }).onError((error, stackTrace) {
         print("Error is :--->$error $stackTrace");
