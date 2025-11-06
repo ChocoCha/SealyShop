@@ -37,7 +37,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _initializeChat() {
-    chatMessagesStream = DatabaseMethod().getChatMessages(widget.chatRoomId);
+    // ดึง Stream ข้อความจาก Firestore โดยตรง
+    chatMessagesStream = FirebaseFirestore.instance
+        .collection("ChatRooms")
+        .doc(widget.chatRoomId)
+        .collection("Messages")
+        .orderBy("time", descending: true)
+        .snapshots();
+    
     // Mark messages as read when opening chat
     _markAsRead();
     setState(() {});
@@ -45,49 +52,91 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _markAsRead() async {
     try {
-      await FirebaseFirestore.instance
-          .collection("ChatRooms")
-          .doc(widget.chatRoomId)
-          .set({
-        "unreadCount": 0,
-        "lastRead": DateTime.now().millisecondsSinceEpoch,
-      }, SetOptions(merge: true));
+      await DatabaseMethod().updateLastRead(widget.chatRoomId, myUid!);
     } catch (e) {
       print("Error marking messages as read: $e");
     }
   }
 
+  // แสดงสถานะการพิมพ์
+  void _showTypingIndicator(bool isTyping) async {
+    if (myUid == null) return;
+    
+    try {
+      await FirebaseFirestore.instance
+          .collection("ChatRooms")
+          .doc(widget.chatRoomId)
+          .set({
+        "isTyping_${myUid}": isTyping,
+        "lastTypingTime": DateTime.now().millisecondsSinceEpoch,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print("Error updating typing status: $e");
+    }
+  }
+  
+  // เพิ่มฟังก์ชันสำหรับการตรวจสอบสถานะ error
+  void _handleError(dynamic error) {
+    print("Error in chat: $error");
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: ${error.toString()}"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> sendMessage() async {
     if (messageController.text.isEmpty || myUid == null) {
-      // ไม่ต้องทำอะไรถ้าข้อความว่างเปล่าหรือผู้ใช้ไม่อยู่ในระบบ
-      return; 
+      return;
     }
 
     String messageText = messageController.text;
+    int timestamp = DateTime.now().millisecondsSinceEpoch;
     
     Map<String, dynamic> messageMap = {
       "message": messageText,
       "senderId": myUid,
-      "time": DateTime.now().millisecondsSinceEpoch,
+      "time": timestamp,
+      "senderName": widget.otherUserName, // เพิ่มชื่อผู้ส่ง
+      "isAdmin": myUid == ChatScreen.adminId, // flag สำหรับข้อความของแอดมิน
     };
 
     try {
-        // 1. บันทึกข้อความ (DatabaseMethod().addMessage ไม่มีการ return)
-        await DatabaseMethod().addMessage(widget.chatRoomId, messageMap);
+        // 1. เพิ่มข้อความในคอลเล็กชัน Messages
+        await FirebaseFirestore.instance
+            .collection("ChatRooms")
+            .doc(widget.chatRoomId)
+            .collection("Messages")
+            .add(messageMap);
         
-        // 2. อัปเดต ChatRooms Document เพื่อให้ Admin List เห็นข้อความล่าสุด
-        await FirebaseFirestore.instance.collection("ChatRooms").doc(widget.chatRoomId).set({
-          "lastMessage": messageText,
-          "lastMessageTime": DateTime.now().millisecondsSinceEpoch,
-          "participants": [myUid, widget.otherUserId],
-        }, SetOptions(merge: true));
+        // 2. อัปเดตข้อมูลห้องแชท
+        await FirebaseFirestore.instance
+            .collection("ChatRooms")
+            .doc(widget.chatRoomId)
+            .set({
+              "lastMessage": messageText,
+              "lastMessageTime": timestamp,
+              "participants": [myUid, widget.otherUserId],
+              "lastSenderId": myUid,
+              "unreadCount": FieldValue.increment(1),
+            }, 
+            SetOptions(merge: true));
 
+        // 3. เคลียร์ข้อความและสถานะการพิมพ์
         messageController.clear();
+        _showTypingIndicator(false);
+        
     } catch (e) {
         print("CHAT WRITE FAILED: $e");
         if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Failed to send message. Check Firebase Rules.")),
+              SnackBar(
+                content: Text("Failed to send message: ${e.toString()}"),
+                backgroundColor: Colors.red,
+              ),
             );
         }
     }
@@ -222,12 +271,60 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isAdmin = myUid == ChatScreen.adminId;
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.otherUserName, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Column(
+          children: [
+            Text(
+              widget.otherUserName, 
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18
+              )
+            ),
+            if (!isAdmin) Text(
+              "Admin Support",
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 1,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.info_outline),
+            onPressed: () {
+              // Show chat info or user details
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Chat Information"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("User: ${widget.otherUserName}"),
+                      SizedBox(height: 8),
+                      Text(isAdmin ? "Role: Admin" : "Role: Customer"),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("Close"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -244,6 +341,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: messageController,
+                    onChanged: (text) {
+                      _showTypingIndicator(text.isNotEmpty);
+                    },
                     decoration: InputDecoration(
                       hintText: "Type a message...",
                       border: OutlineInputBorder(

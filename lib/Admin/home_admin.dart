@@ -6,6 +6,7 @@ import 'package:sealyshop/services/database.dart';
 import 'package:sealyshop/Admin/add_product.dart';
 import 'package:sealyshop/Admin/all_orders.dart';
 import 'package:sealyshop/services/shared_pref.dart';
+import 'package:sealyshop/Admin/admin_chat.dart';
 
 class HomeAdmin extends StatefulWidget {
   const HomeAdmin({super.key});
@@ -149,6 +150,53 @@ void _adminSignOut() async {
                                   Icons.shopping_bag_outlined,
                                   color: Colors.white,
                                   size: 18,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            // Chat Button
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AdminChatPage(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Icon(
+                                      Icons.chat_bubble_outline,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    Positioned(
+                                      right: -2,
+                                      top: -2,
+                                      child: Container(
+                                        padding: EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Text(
+                                          "!",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

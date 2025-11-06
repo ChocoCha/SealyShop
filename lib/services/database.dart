@@ -366,9 +366,80 @@ Future<void> updateProductInCategory(String productId, String categoryName, Map<
 
     // 4. (Admin) ดึงรายการห้องแชททั้งหมดที่ Admin เกี่ยวข้อง
     Stream<QuerySnapshot> getAllChatRoomsForAdmin(String adminId) {
-      return FirebaseFirestore.instance
-          .collection("ChatRooms")
-          .where("participants", arrayContains: adminId) 
-          .snapshots();
+      try {
+        return FirebaseFirestore.instance
+            .collection("ChatRooms")
+            .orderBy("lastMessageTime", descending: true)
+            .snapshots();
+      } catch (e) {
+        print("Error getting chat rooms: $e");
+        // Return empty stream
+        return Stream.empty();
+      }
+    }
+
+    // 5. สร้างหรืออัปเดตห้องแชท
+    Future<void> createOrUpdateChatRoom(String chatRoomId, Map<String, dynamic> chatRoomInfo) async {
+      try {
+        // ตรวจสอบว่าห้องแชทมีอยู่แล้วหรือไม่
+        DocumentSnapshot chatRoom = await FirebaseFirestore.instance
+            .collection("ChatRooms")
+            .doc(chatRoomId)
+            .get();
+
+        if (!chatRoom.exists) {
+          // ถ้ายังไม่มีห้องแชท ให้เพิ่มข้อมูลเริ่มต้น
+          chatRoomInfo.addAll({
+            'createdAt': DateTime.now().millisecondsSinceEpoch,
+            'lastMessageTime': DateTime.now().millisecondsSinceEpoch,
+            'lastMessage': 'Chat room created',
+            'unreadCount': 0,
+          });
+        }
+
+        await FirebaseFirestore.instance
+            .collection("ChatRooms")
+            .doc(chatRoomId)
+            .set(chatRoomInfo, SetOptions(merge: true));
+            
+      } catch (e) {
+        print("Error creating/updating chat room: $e");
+        rethrow;
+      }
+    }
+
+    // 6. อัพเดทสถานะการอ่านข้อความล่าสุด
+    Future<void> updateLastRead(String chatRoomId, String userId) async {
+      try {
+        await FirebaseFirestore.instance
+            .collection("ChatRooms")
+            .doc(chatRoomId)
+            .set({
+              "lastRead_$userId": DateTime.now().millisecondsSinceEpoch,
+              "unreadCount": 0,
+            }, SetOptions(merge: true));
+      } catch (e) {
+        print("Error updating last read: $e");
+      }
+    }
+
+    // 7. เริ่มการแชทใหม่กับ Admin
+    Future<String> startChatWithAdmin(String userId, String userName) async {
+      final String adminId = "4gfJcstTIQlHRzewP0qp"; // Admin ID
+      final String chatRoomId = "${adminId}_$userId";
+
+      try {
+        await createOrUpdateChatRoom(chatRoomId, {
+          'participants': [userId, adminId],
+          'userName': userName,
+          'adminId': adminId,
+          'userId': userId,
+        });
+
+        return chatRoomId;
+      } catch (e) {
+        print("Error starting chat with admin: $e");
+        rethrow;
+      }
     }
 }
