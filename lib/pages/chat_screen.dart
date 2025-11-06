@@ -32,9 +32,29 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     myUid = FirebaseAuth.instance.currentUser?.uid;
-    // 💡 FIX: เริ่มดึง Stream ข้อความ
+    // 💡 FIX: เริ่มดึง Stream ข้อความ และ mark as read
+    _initializeChat();
+  }
+
+  void _initializeChat() {
     chatMessagesStream = DatabaseMethod().getChatMessages(widget.chatRoomId);
+    // Mark messages as read when opening chat
+    _markAsRead();
     setState(() {});
+  }
+
+  void _markAsRead() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("ChatRooms")
+          .doc(widget.chatRoomId)
+          .set({
+        "unreadCount": 0,
+        "lastRead": DateTime.now().millisecondsSinceEpoch,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print("Error marking messages as read: $e");
+    }
   }
 
   Future<void> sendMessage() async {
@@ -77,14 +97,57 @@ class _ChatScreenState extends State<ChatScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: chatMessagesStream,
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        
-        if (!snapshot.hasData) { // 💡 FIX: ใช้ !hasData เพื่อรวม Loading และ Empty State
-          return const Center(child: CircularProgressIndicator());
+        if (!snapshot.hasData) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6F35A5)),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "Loading messages...",
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          );
         }
         
-        // 💡 FIX: ใช้ snapshot.data!.docs.isEmpty เพื่อตรวจสอบว่ามีข้อความหรือไม่
         if (snapshot.data!.docs.isEmpty) {
-             return const Center(child: Text("Start the conversation..."));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.chat_bubble_outline,
+                  size: 64,
+                  color: Colors.grey[400],
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "No messages yet",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Start the conversation!",
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          );
         }
         
         return ListView.builder(
@@ -93,38 +156,63 @@ class _ChatScreenState extends State<ChatScreen> {
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {
             DocumentSnapshot ds = snapshot.data!.docs[index];
-            bool isMe = ds['senderId'] == myUid; 
+            bool isMe = ds['senderId'] == myUid;
+            DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(ds['time'] ?? 0);
+            String timeString = "${messageTime.hour.toString().padLeft(2, '0')}:${messageTime.minute.toString().padLeft(2, '0')}";
 
-            return Container(
-              padding: const EdgeInsets.only(
-                left: 20, 
-                right: 20, 
-                top: 8, 
-                bottom: 8
-              ),
-              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.75,
-                ),
-                decoration: BoxDecoration(
-                  color: isMe ? const Color(0xFF6F35A5) : Colors.grey.shade300,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(15),
-                    topRight: const Radius.circular(15),
-                    bottomLeft: isMe ? const Radius.circular(15) : const Radius.circular(0),
-                    bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(15),
+            return Column(
+              crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 4,
+                    bottom: 2,
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.75,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isMe ? const Color(0xFF6F35A5) : Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                      bottomLeft: isMe ? Radius.circular(15) : Radius.circular(0),
+                      bottomRight: isMe ? Radius.circular(0) : Radius.circular(15),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    ds["message"],
+                    style: TextStyle(
+                      color: isMe ? Colors.white : Colors.black87,
+                      fontSize: 15.0,
+                    ),
                   ),
                 ),
-                padding: const EdgeInsets.all(12),
-                child: Text(
-                  ds["message"],
-                  style: TextStyle(
-                    color: isMe ? Colors.white : Colors.black87,
-                    fontSize: 15.0,
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: isMe ? 0 : 24,
+                    right: isMe ? 24 : 0,
+                    bottom: 8,
+                  ),
+                  child: Text(
+                    timeString,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12.0,
+                    ),
                   ),
                 ),
-              ),
+              ],
             );
           },
         );
